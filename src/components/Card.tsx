@@ -5,6 +5,7 @@ import Modal from "./Modal";
 import useFavorites from "../hooks/useFavorites";
 import useModalState from "../hooks/useModalState";
 import useUserLocation from "../hooks/useUserLocation";
+import CardList from "./CardList";
 
 interface CardProps {
     data: PlacesResponse | undefined;
@@ -13,8 +14,6 @@ interface CardProps {
     error: Error | null;
     currentView: "normal" | "favorite";
 }
-
-const BASE_URL = "http://localhost:3000";
 
 function Card({ data, isLoading, isError, error, currentView }: CardProps) {
     const { addToFavorites, removeFromFavorites } = useFavorites();
@@ -40,31 +39,17 @@ function Card({ data, isLoading, isError, error, currentView }: CardProps) {
                 </h2>
                 <ul className="max-w-[80rem] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {sortPlacesDistance?.map((place) => (
-                        <li key={place.id} className="flex flex-col items-center justify-between">
-                            <img
-                                src={`${BASE_URL}/${place.image.src}`}
-                                alt={place.image.alt}
-                                className="object-cover w-full h-[200px]"
-                                width={300}
-                                height={300}
-                            />
-                            <div className="p-3 flex flex-col gap-2">
-                                <h3 className="font-semibold text-lg">{place.title}</h3>
-                                <button
-                                    className={`bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded`}
-                                    onClick={() => {
-                                        if (currentView === "normal") {
-                                            addToFavorites.mutate(place);
-                                        } else {
-                                            handleOpen();
-                                            setSelectedId(place.id);
-                                        }
-                                    }}
-                                >
-                                    {currentView === "normal" ? "찜하기" : "찜 해제"}
-                                </button>
-                            </div>
-                        </li>
+                        <CardList
+                            key={place.id}
+                            place={place}
+                            currentView={currentView}
+                            addToFavorites={addToFavorites.mutate}
+                            removeFromFavorites={removeFromFavorites.mutate}
+                            isOpen={isOpen}
+                            setSelectedId={setSelectedId}
+                            handleOpen={handleOpen}
+                            handleRemove={handleRemove}
+                        />
                     ))}
                 </ul>
             </article>
